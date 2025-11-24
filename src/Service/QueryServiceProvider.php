@@ -9,7 +9,7 @@ class QueryServiceProvider extends ServiceProvider
 {
 
 
-    public function __construct(protected Application $app)
+    public function __construct(Application $app)
     {
     }
 
