@@ -1,0 +1,20 @@
+{
+    "name": "btamilio/hs-dummy-json",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Btamilio\\HsDummyJson\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Brenden Tamilio",
+            "email": "btamilio@gmail.com"
+        }
+    ],
+    "require": {
+        "symfony/validator": "^7.3",
+        "symfony/http-client": "^7.3",
+        "symfony/http-foundation": "^7.3"
+    }
+}
