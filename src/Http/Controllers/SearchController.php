@@ -3,7 +3,6 @@
 namespace Btamilio\HsDummyJson\Http\Controllers;
 
 use Illuminate\Routing\Controller;
-use Illuminate\Illuminate\Http\Response;
 use Btamilio\HsDummyJson\Service\QueryServiceProvider;
 
 class SearchController extends Controller
