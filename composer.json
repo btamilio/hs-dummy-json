@@ -15,14 +15,15 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Btamilio\\HsDummyJson\\Service\\QueryService"
+                "Btamilio\\HsDummyJson\\Service\\QueryServiceProvider"
             ]
         }
     },
     "require": {
+         "php": "^8.2",
         "symfony/validator": "^7.3",
         "symfony/http-client": "^7.3",
         "symfony/http-foundation": "^7.3",
-        "illuminate/routing": "^12.39"
+        "laravel/framework": "^11.9"
     }
 }
