@@ -12,9 +12,17 @@
             "email": "btamilio@gmail.com"
         }
     ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Btamilio\\HsDummyJson\\Service\\QueryService"
+            ]
+        }
+    },
     "require": {
         "symfony/validator": "^7.3",
         "symfony/http-client": "^7.3",
-        "symfony/http-foundation": "^7.3"
+        "symfony/http-foundation": "^7.3",
+        "illuminate/routing": "^12.39"
     }
 }
