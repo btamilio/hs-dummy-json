@@ -7,10 +7,11 @@ use Btamilio\HsDummyJson\Service\QueryServiceProvider;
 
 class SearchController extends Controller
 {
-    public function __construct(private QueryServiceProvider $service) {}
+    public function __construct(protected QueryServiceProvider $service) {}
 
     public function __invoke()
     {
+        dd($this);
         return $this->response($this->service->search($this->request()));
     }
 }
