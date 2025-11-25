@@ -12,7 +12,7 @@ use Illuminate\Validation\Factory;
 class QueryService
 {
 
-protected Translator $translator;
+    protected Translator $translator;
 
     public function __construct()
     {
