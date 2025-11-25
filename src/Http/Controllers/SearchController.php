@@ -33,7 +33,7 @@ class SearchController extends Controller
         }
 
 
-        $results = $this->service->search($request->all());
+        $results = $this->service->search($validated);
 
         foreach ($results["users"] as &$result) {
             $result = [
