@@ -17,12 +17,13 @@ protected Translator $translator;
 
     public function __construct()
     {
-        $loader = new ArrayLoader();
+        // load a custom translator without relying on the Laravel container / facades
+        $translations = require __DIR__ . '/../../lang/en/validation.php';
+        $loader = new ArrayLoader();       
+        $loader->addMessages('en', "validation", $translations);
+
         $this->translator = new Translator($loader, 'en');
 
-        // Load sp,e translation messages
-        $translations = require __DIR__ . '/../../lang/en/validation.php';
-        $loader->addMessages('en', null, $translations);
     }
 
 
@@ -30,12 +31,12 @@ protected Translator $translator;
     public function validate(Request $request): array
     {
         // Build a validator without relying on the Laravel container / facades
-        $validator = (new Factory(new Translator(new ArrayLoader(), 'en')))
+        $validator = (new Factory($this->translator))
             ->make(
                 $request->all(),
                 [
                     'q' => 'required|string|max:100',
-                ],
+                ], 
             );
 
         if ($validator->fails()) {
