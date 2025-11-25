@@ -27,12 +27,14 @@ class SearchController extends Controller
         $results = $this->service->search($request->all());
 
         foreach ($results["users"] as &$result) {
-            $result = ArrayToXml::convert([
+            $result = [
                 "first_name" => $result['firstName'],
                 "last_name"  => $result['lastName'],
                 "email"      => $result['email'],
-            ], 'customer');
+            ];
         }
+
+ 
 
         // build a single XML response (assuming you want <livelookup> wrapper)
         $xml = ArrayToXml::convert(

@@ -14,7 +14,7 @@ $queryService = new QueryService();
 $controller = new SearchController($queryService);
 $response = $controller->query($request);
 
-dd($response);
+echo $response;
 
 // // Normalize response
 // if ($response instanceof Response) {
