@@ -15,9 +15,6 @@ $controller = new SearchController($queryService);
  
 $response = $controller->query($request);
 
- 
-
-
 // Normalize response
 if ($response instanceof Response) {
 	http_response_code($response->getStatusCode());
