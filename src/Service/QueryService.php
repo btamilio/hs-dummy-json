@@ -31,15 +31,14 @@ class QueryService
     {
 
         // test if at leat one searchable field is present
-         if (empty(array_filter($request->only(['last_name', 'first_name', 'company_id', 'email', 'q'])))) {
-            return ['errors' => ['At least one of last_name, first_name, company_id, email, or q is required.']];
+         if (empty(array_filter($request->only(['last_name', 'first_name', 'email', 'q'])))) {
+            return ['errors' => ['At least one of last_name, first_name, email, or q is required.']];
         }
      
         // Build a validator without relying on the Laravel container / facades
         $validator = (new Factory($this->translator))->make($request->all(), [
             'last_name'  => 'sometimes|string',
             'first_name' => 'sometimes|string',
-            'company_id' => 'sometimes|numeric',
             'email'      => 'sometimes|email',
             'q'          => 'sometimes|string',
         ]);
@@ -61,7 +60,7 @@ class QueryService
         // though we cold also use filter instead of search if it were a specific field...
  
         foreach (array_filter($input) as $key => $value) { //FIFO
-            if (is_null($query) && in_array($key, ['q', 'first_name', 'last_name', 'email', 'company_id'])) {
+            if (is_null($query) && in_array($key, ['q', 'first_name', 'last_name', 'email'])) {
                     $query = $value;
             }
         }
