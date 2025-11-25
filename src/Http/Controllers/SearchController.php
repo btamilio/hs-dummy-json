@@ -5,11 +5,9 @@ namespace Btamilio\HsDummyJson\Http\Controllers;
 use Btamilio\HsDummyJson\Service\QueryService;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
-
- 
+use Illuminate\Http\Response;
 
 use Spatie\ArrayToXml\ArrayToXml;
-use Symfony\Component\HttpFoundation\Response;
 
 class SearchController extends Controller
 {
@@ -22,13 +20,9 @@ class SearchController extends Controller
 
         // Handle validation errors
         if (isset($validated["errors"])) {
-            $errorXml = ArrayToXml::convert(
-                ['errors' => $validated["errors"]],
-                'livelookup',
-                true,
-                'UTF-8',
-                '1.0'
-            );
+            $errorXml = ArrayToXml::convert([
+                'errors' => $validated["errors"]
+            ], 'livelookup', true, 'UTF-8', '1.0');
             return new Response($errorXml, 400, ['Content-Type' => 'application/xml']);
         }
 
@@ -43,13 +37,9 @@ class SearchController extends Controller
             ];
         }
 
-        $xml = ArrayToXml::convert(
-            ['customer' => $results["users"] ?? [] ],
-            'livelookup',
-            true,
-            'UTF-8',
-            '1.0'
-        );
+        $xml = ArrayToXml::convert([
+                'customer' => $results["users"] ?? [],
+            ], 'livelookup', true, 'UTF-8', '1.0');
 
         return new Response($xml, 200, ['Content-Type' => 'application/xml']);
     }

@@ -7,8 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Factory;
-use Illuminate\Translation\FileLoader;
-use Illuminate\Filesystem\Filesystem;
+
 
 class QueryService
 {
@@ -31,13 +30,9 @@ protected Translator $translator;
     public function validate(Request $request): array
     {
         // Build a validator without relying on the Laravel container / facades
-        $validator = (new Factory($this->translator))
-            ->make(
-                $request->all(),
-                [
-                    'q' => 'required|string|max:100',
-                ], 
-            );
+        $validator = (new Factory($this->translator))->make($request->all(),  [
+                'q' => 'required|string|max:100',
+        ]);
 
         if ($validator->fails()) {
             return ['errors' => $validator->errors()->all()];
