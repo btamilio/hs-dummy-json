@@ -5,8 +5,11 @@ namespace Btamilio\HsDummyJson\Http\Controllers;
 use Btamilio\HsDummyJson\Service\QueryService;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
+
+ 
+
 use Spatie\ArrayToXml\ArrayToXml;
+use Symfony\Component\HttpFoundation\Response;
 
 class SearchController extends Controller
 {
@@ -14,15 +17,21 @@ class SearchController extends Controller
 
     public function query(Request $request)
     {
-        try {
-            $request->validate([
-                "q" => "required|string|max:100",
-            ]);
-        } catch (ValidationException $e) {
-            return response(['errors' => $e->errors()], $e->status ?? 422);
-        } catch (\Exception $e) {
-            return response(['errors' => ["could not validate input"]], 422);
+   
+        $validated = $this->service->validate($request);
+
+        // Handle validation errors
+        if (isset($validated["errors"])) {
+            $errorXml = ArrayToXml::convert(
+                ['errors' => $validated["errors"]],
+                'livelookup',
+                true,
+                'UTF-8',
+                '1.0'
+            );
+            return new Response($errorXml, 400, ['Content-Type' => 'application/xml']);
         }
+
 
         $results = $this->service->search($request->all());
 
@@ -35,13 +44,13 @@ class SearchController extends Controller
         }
 
         $xml = ArrayToXml::convert(
-            ['customer' => $results["users"]],
+            ['customer' => $results["users"] ?? [] ],
             'livelookup',
             true,
             'UTF-8',
             '1.0'
         );
 
-        return response($xml, 200)->header('Content-Type', 'application/xml');
+        return new Response($xml, 200, ['Content-Type' => 'application/xml']);
     }
 }
