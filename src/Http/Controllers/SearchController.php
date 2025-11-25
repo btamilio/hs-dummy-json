@@ -28,15 +28,12 @@ class SearchController extends Controller
 
         foreach ($results["users"] as &$result) {
             $result = [
-                "first_name" => $result['firstName'],
-                "last_name"  => $result['lastName'],
-                "email"      => $result['email'],
+                "first_name" => $result['firstName'] ?? "",
+                "last_name"  => $result['lastName'] ?? "",
+                "email"      => $result['email'] ?? "",
             ];
         }
 
- 
-
-        // build a single XML response (assuming you want <livelookup> wrapper)
         $xml = ArrayToXml::convert(
             ['customer' => $results["users"]],
             'livelookup',
