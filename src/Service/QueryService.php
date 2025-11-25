@@ -20,9 +20,9 @@ class QueryService
 
  
         try {
-            return $request->validate( [
+            $request->validate( [
                  'q' => 'required|string|max:100',
-        ], $request->all());
+        ]);
         } catch (ValidationException $e) {
             return  ["errors" => $e->getMessage() ];
         } catch (Exception $e) {
