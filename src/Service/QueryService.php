@@ -18,10 +18,7 @@ class QueryService
     public function validate(Request $request) 
     {
 
-
-        return $request->validate([
-            'q' => 'required|string|max:100',
-        ], $request->all());
+ 
         try {
             return $request->validate( [
                  'q' => 'required|string|max:100',
