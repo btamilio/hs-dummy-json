@@ -11,36 +11,46 @@ use Spatie\ArrayToXml\ArrayToXml;
 
 class SearchController extends Controller
 {
+
+ 
     public function __construct(protected QueryService $service) {}
 
     public function query(Request $request)
     {
-   
+        // sanity check
         $validated = $this->service->validate($request);
 
         // Handle validation errors
         if (isset($validated["errors"])) {
-            $errorXml = ArrayToXml::convert([
-                'errors' => $validated["errors"]
-            ], 'livelookup', true, 'UTF-8', '1.0');
-            return new Response($errorXml, 400, ['Content-Type' => 'application/xml']);
-        }
-
+            $response_data = ['errors' => $validated["errors"] ];
+            $response_status = 400;
+        } 
 
         $results = $this->service->search($validated);
-
-        foreach ($results["users"] as &$result) {
-            $result = [
-                "first_name" => $result['firstName'] ?? "",
-                "last_name"  => $result['lastName'] ?? "",
-                "email"      => $result['email'] ?? "",
-            ];
+ 
+        if (isset($results["errors"])) {
+            $response_data = ['errors' => $results["errors"]];
+        } else {
+            // format results to HelpSpot live-lookup spec
+            foreach ($results["users"] ?? [] as &$result) {
+                // TODO: this mapping could be in an enum or configuration
+                $result = [
+                    "id"          => $result['id'] ?? "",
+                    "first_name"  => $result['firstName'] ?? "",
+                    "last_name"   => $result['lastName'] ?? "",
+                    "email"       => $result['email'] ?? "",
+                ];
+            }
         }
 
-        $xml = ArrayToXml::convert([
-                'customer' => $results["users"] ?? [],
-            ], 'livelookup', true, 'UTF-8', '1.0');
+        // if no results, return a notice instead. there isn't much to the spec here.
+        $response_data = (empty($results["users"])) 
+                                ? ['notice' => 'No results found'] 
+                                : ['customer' => $results["users"] ];
 
-        return new Response($xml, 200, ['Content-Type' => 'application/xml']);
+
+        $xml = ArrayToXml::convert($response_data, 'livelookup', true, 'UTF-8', '1.0'); //TODO: this could be in configuration
+        return new Response($xml, $response_status ?? 200, ['Content-Type' => 'application/xml']);
+        
     }
 }

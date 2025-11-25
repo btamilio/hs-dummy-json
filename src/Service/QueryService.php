@@ -13,6 +13,7 @@ class QueryService
 {
 
     protected Translator $translator;
+    protected string $endpoint = 'https://dummyjson.com/users';
 
     public function __construct()
     {
@@ -26,12 +27,15 @@ class QueryService
     }
 
 
-
     public function validate(Request $request): array
     {
         // Build a validator without relying on the Laravel container / facades
         $validator = (new Factory($this->translator))->make($request->all(),  [
-                'q' => 'required|string|max:100',
+                'last_name' => 'sometimes|string',
+                'first_name' => 'sometimes|string',
+                'company_id' => 'sometimes|numeric', // TODO: validate against existing company IDs in DB
+                'email' => 'sometimes|email',
+                'q' => 'sometimes|string', // this isn't in the spec, but it is useful for testing
         ]);
 
         if ($validator->fails()) {
@@ -41,13 +45,27 @@ class QueryService
         return $validator->validated();
     }
 
+ 
     public function search(array $input): array
     {
         $http = new HttpFactory();
+        $query = NULL;
 
-        return $http
-            ->get('https://dummyjson.com/users/search', ['q' => $input['q'] ?? ''])
-            ->json();
+ 
+        // dummyjson doesn't support complex queries, so for simplicity, we will just use 'q' to search the first field we find,
+        // though we cold also use filter instead of search if it were a specific field...
+
+ 
+            foreach (array_filter($input) as $key => $value) { //FIFO
+                if (is_null($query) && in_array($key, ['q', 'first_name', 'last_name', 'email', 'company_id'])) {
+                        $query = $value;
+                }
+            }
+         
+        return ($query) 
+            ? $http->get($this->endpoint . "/search", ["q" => $query, "select" => ["id", "firstName", "lastName", "email"] ])->json()
+            : ['errors' => "expected at least one searchable field (q, first_name, last_name, email, company_id)"];
+  
     }
 }
 
