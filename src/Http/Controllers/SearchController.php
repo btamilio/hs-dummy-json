@@ -17,6 +17,7 @@ class SearchController extends Controller
 
     public function query(Request $request)
     {
+        $customers = [];
         // sanity check
         $validated = $this->service->validate($request);
 
@@ -33,9 +34,9 @@ class SearchController extends Controller
                 $response_data = ['errors' => $results["errors"]];
             } else {
                 // format results to HelpSpot live-lookup spec
-                foreach ($results["users"] ?? [] as &$result) {
+                foreach ($results["users"] ?? [] as $result) {
                     // TODO: this mapping could be in an enum or configuration
-                    $result = [
+                    $customers[] = [
                         "id"          => $result['id'] ?? "",
                         "first_name"  => $result['firstName'] ?? "",
                         "last_name"   => $result['lastName'] ?? "",
@@ -44,9 +45,9 @@ class SearchController extends Controller
                 }
                 
                 // if no results, return a notice instead. there isn't much to the spec here.
-                $response_data = (empty($results["users"]))
-                    ? ['notice' => 'No results found']
-                    : ['customer' => $results["users"]];
+                $response_data = (empty($customers))
+                                        ? ['notice' => 'No results found']
+                                        : ['customer' => $customers];
 
             }
         }
