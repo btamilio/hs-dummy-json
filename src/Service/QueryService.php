@@ -31,6 +31,8 @@ class QueryService
     {
         // Build a validator without relying on the Laravel container / facades
         $validator = (new Factory($this->translator))->make($request->all(),  [
+
+            
                 'last_name' => 'sometimes|string',
                 'first_name' => 'sometimes|string',
                 'company_id' => 'sometimes|numeric', // TODO: validate against existing company IDs in DB
@@ -38,11 +40,19 @@ class QueryService
                 'q' => 'sometimes|string', // this isn't in the spec, but it is useful for testing
         ]);
 
-        if ($validator->fails()) {
-            return ['errors' => $validator->errors()->all()];
-        }
+ 
+        // make sure at least one field is present
+        $validator->after(function ($validator) use ($request) {
+            if (! $request->filled(['last_name', 'first_name', 'company_id', 'email', 'q'])) {
+                $validator->errors()->add('q', 'At least one of last_name, first_name, company_id, email, or q is required.');
+            }
+        });
 
-        return $validator->validated();
+ 
+        return ($validator->errors()->isNotEmpty())
+            ?   ['errors' => $validator->errors()->all()]
+            : $validator->validated();
+  
     }
 
  
@@ -50,17 +60,15 @@ class QueryService
     {
         $http = new HttpFactory();
         $query = NULL;
-
  
         // dummyjson doesn't support complex queries, so for simplicity, we will just use 'q' to search the first field we find,
         // though we cold also use filter instead of search if it were a specific field...
-
  
-            foreach (array_filter($input) as $key => $value) { //FIFO
-                if (is_null($query) && in_array($key, ['q', 'first_name', 'last_name', 'email', 'company_id'])) {
-                        $query = $value;
-                }
+        foreach (array_filter($input) as $key => $value) { //FIFO
+            if (is_null($query) && in_array($key, ['q', 'first_name', 'last_name', 'email', 'company_id'])) {
+                    $query = $value;
             }
+        }
          
         return ($query) 
             ? $http->get($this->endpoint . "/search", ["q" => $query, "select" => ["id", "firstName", "lastName", "email"] ])->json()

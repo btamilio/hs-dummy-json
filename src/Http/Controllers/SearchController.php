@@ -20,33 +20,38 @@ class SearchController extends Controller
         // sanity check
         $validated = $this->service->validate($request);
 
+
         // Handle validation errors
         if (isset($validated["errors"])) {
             $response_data = ['errors' => $validated["errors"] ];
             $response_status = 400;
-        } 
-
-        $results = $this->service->search($validated);
- 
-        if (isset($results["errors"])) {
-            $response_data = ['errors' => $results["errors"]];
         } else {
-            // format results to HelpSpot live-lookup spec
-            foreach ($results["users"] ?? [] as &$result) {
-                // TODO: this mapping could be in an enum or configuration
-                $result = [
-                    "id"          => $result['id'] ?? "",
-                    "first_name"  => $result['firstName'] ?? "",
-                    "last_name"   => $result['lastName'] ?? "",
-                    "email"       => $result['email'] ?? "",
-                ];
+ 
+            $results = $this->service->search($validated);
+    
+            if (isset($results["errors"])) {
+                $response_data = ['errors' => $results["errors"]];
+            } else {
+                // format results to HelpSpot live-lookup spec
+                foreach ($results["users"] ?? [] as &$result) {
+                    // TODO: this mapping could be in an enum or configuration
+                    $result = [
+                        "id"          => $result['id'] ?? "",
+                        "first_name"  => $result['firstName'] ?? "",
+                        "last_name"   => $result['lastName'] ?? "",
+                        "email"       => $result['email'] ?? "",
+                    ];
+                }
+                
+                // if no results, return a notice instead. there isn't much to the spec here.
+                $response_data = (empty($results["users"]))
+                    ? ['notice' => 'No results found']
+                    : ['customer' => $results["users"]];
+
             }
         }
 
-        // if no results, return a notice instead. there isn't much to the spec here.
-        $response_data = (empty($results["users"])) 
-                                ? ['notice' => 'No results found'] 
-                                : ['customer' => $results["users"] ];
+
 
 
         $xml = ArrayToXml::convert($response_data, 'livelookup', true, 'UTF-8', '1.0'); //TODO: this could be in configuration
