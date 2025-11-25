@@ -31,28 +31,19 @@ class QueryService
     {
         // Build a validator without relying on the Laravel container / facades
         $validator = (new Factory($this->translator))->make($request->all(),  [
-
-            
-                'last_name' => 'sometimes|string',
-                'first_name' => 'sometimes|string',
-                'company_id' => 'sometimes|numeric', // TODO: validate against existing company IDs in DB
-                'email' => 'sometimes|email',
-                'q' => 'sometimes|string', // this isn't in the spec, but it is useful for testing
+            'last_name'  => 'nullable|string|required_without_all:first_name,company_id,email,q',
+            'first_name' => 'nullable|string|required_without_all:last_name,company_id,email,q',
+            'company_id' => 'nullable|numeric|required_without_all:last_name,first_name,email,q',
+            'email'      => 'nullable|email|required_without_all:last_name,first_name,company_id,q',
+            'q'          => 'nullable|string|required_without_all:last_name,first_name,company_id,email',
         ]);
 
  
-        // make sure at least one field is present
-        $validator->after(function ($validator) use ($request) {
-            if (! $request->filled(['last_name', 'first_name', 'company_id', 'email', 'q'])) {
-                $validator->errors()->add('q', 'At least one of last_name, first_name, company_id, email, or q is required.');
-            }
-        });
+        if ($validator->fails() ) {
+            return ['errors' => $validator->errors()->all()];
+        }
 
- 
-        return ($validator->errors()->isNotEmpty())
-            ?   ['errors' => $validator->errors()->all()]
-            : $validator->validated();
-  
+        return $validator->validated();
     }
 
  
