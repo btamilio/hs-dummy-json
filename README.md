@@ -1,7 +1,7 @@
 # hs-dummy-json
 
   
-This PHP composer module is an example live-lookup integration of ["DummyJson User Search"](https://dummyjson.com/users/search?q=John) with ["HelpSpot"](https://helpsot.com) designed to be used with or without the ["Laravel"](https://www.laravel.com) framework.
+This PHP composer module is an example live-lookup integration of ["DummyJson User Search"](https://dummyjson.com/users/search?q=John) with ["HelpSpot"](https://helpspot.com) designed to be used with or without the ["Laravel"](https://www.laravel.com) framework.
 
 ##  Installation
 
